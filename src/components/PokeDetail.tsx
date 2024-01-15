@@ -1,4 +1,4 @@
-import { Card } from '@mui/material'
+import { Card, CardContent, CardHeader, Divider, Paper, Typography } from '@mui/material'
 import React, { Component } from 'react'
 import { Pokemon_V2_Pokemon } from '../gql/graphql'
 import PokeDetailTabs from './PokeDetailTabs'
@@ -22,18 +22,24 @@ export default class PokeDetail extends Component<Props, State> {
     }
     render() {
         return (
-            <Card variant="outlined" sx={{ width: '100%', height: '100%' }}>
-                <img src={this.getSprite()} alt='' style={{ scale: '1'}} />
-                <>Id: {this.props.pokemon.id}</>
-                <br />
-                <>Name: {this.props.pokemon.name}</>
-                <br />
-                <>Height: {this.props.pokemon.height}</>
-                <br />
-                <>Weight: {this.props.pokemon.weight}</>
-                <br />
-                <>Base XP: {this.props.pokemon.base_experience}</>
-                <PokeDetailTabs pokemon={this.props.pokemon} />
+            <Card variant="elevation" elevation={1} sx={{ width: '100%', height: '100%', border: 'thick double', }} className='pokedex'>
+                <CardHeader title={
+                    <Paper>
+                        <Typography variant='body2'>{this.props.pokemon.name}</Typography>
+                        <Typography variant='body2'>Id: {this.props.pokemon.id}</Typography>
+                        <Typography variant='body2'>Height: {this.props.pokemon.height}</Typography>
+                        <Typography variant='body2'>Weight: {this.props.pokemon.weight}</Typography>
+                        <Typography variant='body2'>Base XP: {this.props.pokemon.base_experience}</Typography>
+                    </Paper>}
+                    avatar={
+                        <img src={this.getSprite()} alt='' />}
+                />
+                <CardContent>
+                    <Paper elevation={2}>
+                        <Divider />
+                        <PokeDetailTabs pokemon={this.props.pokemon} />
+                    </Paper>
+                </CardContent>
             </Card>
         )
     }

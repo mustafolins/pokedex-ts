@@ -5,7 +5,7 @@ import AutocompleteName from './autocomplete/AutocompleteName';
 import IntegerSelector from './selectors/IntegerSelector';
 import { allPokemonAndSpritesQuery, pokemonDetailQuery, pokemonHeightWeightQuery, pokemonHeightWeightTypeQuery, pokemonTypesQuery } from './GqlQueries';
 import PokeCard from './PokeCard';
-import { List, ListItem, Pagination } from '@mui/material';
+import { List, ListItem, Pagination, Paper } from '@mui/material';
 import PokeDetail from './PokeDetail';
 import AutocompleteType from './autocomplete/AutocompleteType';
 
@@ -212,7 +212,7 @@ export default class Pokedex extends Component<Props, State> {
 
   render() {
     return (
-      <>
+      <Paper elevation={0}>
         <AutocompleteName label='Name' value={this.state.selectedName} searchTextChanged={this.nameChanged} pokemon={this.state.filteredPokemon} />
         <AutocompleteType label='Type' value={this.state.selectedType} searchTextChanged={this.typeChanged} types={this.state.types} />
         <IntegerSelector label='Height' handleChanged={this.heightChanged} />
@@ -239,7 +239,7 @@ export default class Pokedex extends Component<Props, State> {
             </tr>
           </tbody>
         </table>
-      </>
+      </Paper>
     )
   }
 }

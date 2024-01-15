@@ -25,7 +25,7 @@ export default class PokeCard extends Component<Props, State> {
     }
     render() {
         return (
-            <Card variant="outlined" sx={{ width: '100%', height: '100%' }} onClick={this.handleClicked}>
+            <Card variant="elevation" elevation={2} sx={{ width: '100%', height: '100%', border: 'solid' }} onClick={this.handleClicked}>
                 <table>
                     <tbody>
                         <tr>

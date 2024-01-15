@@ -1,4 +1,4 @@
-import { Card, List, ListItem, Tab, Tabs } from '@mui/material'
+import { Card, Chip, List, ListItem, Tab, Tabs, Typography } from '@mui/material'
 import React, { Component } from 'react'
 import { Pokemon_V2_Pokemon } from '../gql/graphql'
 
@@ -39,7 +39,7 @@ export default class PokeDetailTabs extends Component<Props, State> {
                     <List sx={{ overflow: 'auto', maxHeight: '60vh' }}>
                         {this.props.pokemon.pokemon_v2_pokemontypes.map((type, index) =>
                             <ListItem key={`pokemon-type-${index}`}>
-                                {type.pokemon_v2_type?.name}
+                                <Chip label={type.pokemon_v2_type?.name} />
                             </ListItem>
                         )}
                     </List>
@@ -48,12 +48,10 @@ export default class PokeDetailTabs extends Component<Props, State> {
                     <List sx={{ overflow: 'auto', maxHeight: '60vh' }}>
                         {this.props.pokemon.pokemon_v2_pokemonstats.map((stat, index) =>
                             <ListItem key={`pokemon-stat-${index}`}>
-                                <Card variant="outlined" sx={{ width: '100%' }}>
-                                    <>Stat: {stat.pokemon_v2_stat?.name}</>
-                                    <br />
-                                    <>Base Stat: {stat.base_stat}</>
-                                    <br />
-                                    <>Effort: {stat.effort}</>
+                                <Card variant="elevation" elevation={3} sx={{ width: '100%' }}>
+                                    <Typography variant='subtitle1'>{stat.pokemon_v2_stat?.name}</Typography>
+                                    <Typography variant='body2'>Base Stat: {stat.base_stat}</Typography>
+                                    <Typography variant='body2'>Effort: {stat.effort}</Typography>
                                 </Card>
                             </ListItem>
                         )}
@@ -63,19 +61,13 @@ export default class PokeDetailTabs extends Component<Props, State> {
                     <List sx={{ overflow: 'auto', maxHeight: '60vh' }}>
                         {this.props.pokemon.pokemon_v2_pokemonmoves.map((move, index) =>
                             <ListItem key={`pokemon-move-${index}`}>
-                                <Card variant="outlined" sx={{ width: '100%' }}>
-                                    <>Move: {move.pokemon_v2_move?.name}</>
-                                    <br />
-                                    <>Power: {move.pokemon_v2_move?.power}</>
-                                    <br />
-                                    <>Accuracy: {move.pokemon_v2_move?.accuracy}</>
-                                    <br />
-                                    <>Damage Class: {move.pokemon_v2_move?.pokemon_v2_movedamageclass?.name}</>
-                                    <br />
-                                    <>Flavor Text: {move.pokemon_v2_move?.pokemon_v2_moveflavortexts.length === 0 ? null : move.pokemon_v2_move?.pokemon_v2_moveflavortexts[0].flavor_text}</>
-                                    <br />
-                                    <>Learn Method: {move.pokemon_v2_movelearnmethod?.name}</>
-                                    <br />
+                                <Card variant="elevation" elevation={3} sx={{ width: '100%' }}>
+                                    <Typography variant='subtitle1'>{move.pokemon_v2_move?.name}</Typography>
+                                    <Typography variant='body2'>Power: {move.pokemon_v2_move?.power}</Typography>
+                                    <Typography variant='body2'>Accuracy: {move.pokemon_v2_move?.accuracy}</Typography>
+                                    <Typography variant='body2'>Damage Class: {move.pokemon_v2_move?.pokemon_v2_movedamageclass?.name}</Typography>
+                                    <Typography variant='body2'>Flavor Text: {move.pokemon_v2_move?.pokemon_v2_moveflavortexts.length === 0 ? null : move.pokemon_v2_move?.pokemon_v2_moveflavortexts[0].flavor_text}</Typography>
+                                    <Typography variant='body2'>Learn Method: {move.pokemon_v2_movelearnmethod?.name}</Typography>
                                 </Card>
                             </ListItem>
                         )}
@@ -85,15 +77,11 @@ export default class PokeDetailTabs extends Component<Props, State> {
                     <List sx={{ overflow: 'auto', maxHeight: '60vh' }}>
                         {this.props.pokemon.pokemon_v2_encounters.map((encounter, index) =>
                             <ListItem key={`pokemon-encounter-${index}`}>
-                                <Card variant="outlined" sx={{ width: '100%' }}>
-                                    <>Location: {encounter.pokemon_v2_locationarea?.pokemon_v2_location?.pokemon_v2_locationnames[0].name}</>
-                                    <br />
-                                    <>Encounter Method: {encounter.pokemon_v2_encounterslot?.pokemon_v2_encountermethod?.name}</>
-                                    <br />
-                                    <>Minimum Level: {encounter.min_level}</>
-                                    <br />
-                                    <>Maximum Level: {encounter.max_level}</>
-                                    <br />
+                                <Card variant="elevation" elevation={3} sx={{ width: '100%' }}>
+                                    <Typography variant='subtitle1'>{encounter.pokemon_v2_locationarea?.pokemon_v2_location?.pokemon_v2_locationnames[0].name}</Typography>
+                                    <Typography variant='body2'>Encounter Method: {encounter.pokemon_v2_encounterslot?.pokemon_v2_encountermethod?.name}</Typography>
+                                    <Typography variant='body2'>Minimum Level: {encounter.min_level}</Typography>
+                                    <Typography variant='body2'>Maximum Level: {encounter.max_level}</Typography>
                                 </Card>
                             </ListItem>
                         )}
@@ -103,13 +91,10 @@ export default class PokeDetailTabs extends Component<Props, State> {
                     <List sx={{ overflow: 'auto', maxHeight: '60vh' }}>
                         {this.props.pokemon.pokemon_v2_pokemonabilities.map((ability, index) =>
                             <ListItem key={`pokemon-ability-${index}`}>
-                                <Card variant="outlined" sx={{ width: '100%' }}>
-                                    <>Ability: {ability.pokemon_v2_ability?.name}</>
-                                    <br />
-                                    <>Summary: {ability.pokemon_v2_ability?.pokemon_v2_abilityeffecttexts[0].short_effect}</>
-                                    <br />
-                                    <>Description: {ability.pokemon_v2_ability?.pokemon_v2_abilityeffecttexts[0].effect}</>
-                                    <br />
+                                <Card variant="elevation" elevation={3} sx={{ width: '100%' }}>
+                                    <Typography variant='subtitle1'>{ability.pokemon_v2_ability?.name}</Typography>
+                                    <Typography variant='body2'>Summary: {ability.pokemon_v2_ability?.pokemon_v2_abilityeffecttexts[0].short_effect}</Typography>
+                                    <Typography variant='body2'>Description: {ability.pokemon_v2_ability?.pokemon_v2_abilityeffecttexts[0].effect}</Typography>
                                 </Card>
                             </ListItem>
                         )}

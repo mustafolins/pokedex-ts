@@ -1,5 +1,6 @@
 import React from 'react';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
+import { ThemeProvider, createTheme } from '@mui/material';
 import './App.css';
 import Pokedex from './components/Pokedex';
 
@@ -16,14 +17,29 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+const theme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#DF5151',
+    },
+    secondary: {
+      main: '#51dfdf',
+    },
+    background: {
+      default: '#ffebee',
+      paper: '#ffcdd2',
+    },
+  },
+});
+
 function App() {
   return (
-    <div className="App">
-
-      <ApolloProvider client={client}>
+    <ApolloProvider client={client}>
+      <ThemeProvider theme={theme}>
         <Pokedex client={client} />
-      </ApolloProvider>
-    </div>
+      </ThemeProvider>
+    </ApolloProvider>
   );
 }
 
