@@ -61,6 +61,9 @@ export const pokemonHeightWeightTypeStatQuery = gql`
         $type: [String!]
         $hp: Int! = 0
         $attack: Int! = 0
+        $defense: Int! = 0
+        $specialattack: Int! = 0
+        $specialdefense: Int! = 0
     ) {
         pokemon: pokemon_v2_pokemon(
             where: {
@@ -80,6 +83,24 @@ export const pokemonHeightWeightTypeStatQuery = gql`
                             pokemon_v2_stat: { name: { _eq: "attack" } }
                         }
                     }
+                    {
+                        pokemon_v2_pokemonstats: {
+                            base_stat: { _gte: $defense }
+                            pokemon_v2_stat: { name: { _eq: "defense" } }
+                        }
+                    }
+                    {
+                        pokemon_v2_pokemonstats: {
+                            base_stat: { _gte: $specialattack }
+                            pokemon_v2_stat: { name: { _eq: "special-attack" } }
+                        }
+                    }
+                    {
+                        pokemon_v2_pokemonstats: {
+                            base_stat: { _gte: $specialdefense }
+                            pokemon_v2_stat: { name: { _eq: "special-defense" } }
+                        }
+                    }
                 ]
             }
         ) {
@@ -94,6 +115,9 @@ export const pokemonHeightWeightStatQuery = gql`
         $weight: Int = 0
         $hp: Int! = 0
         $attack: Int! = 0
+        $defense: Int! = 0
+        $specialattack: Int! = 0
+        $specialdefense: Int! = 0
     ) {
         pokemon: pokemon_v2_pokemon(
             where: {
@@ -110,6 +134,24 @@ export const pokemonHeightWeightStatQuery = gql`
                         pokemon_v2_pokemonstats: {
                             base_stat: { _gte: $attack }
                             pokemon_v2_stat: { name: { _eq: "attack" } }
+                        }
+                    }
+                    {
+                        pokemon_v2_pokemonstats: {
+                            base_stat: { _gte: $defense }
+                            pokemon_v2_stat: { name: { _eq: "defense" } }
+                        }
+                    }
+                    {
+                        pokemon_v2_pokemonstats: {
+                            base_stat: { _gte: $specialattack }
+                            pokemon_v2_stat: { name: { _eq: "special-attack" } }
+                        }
+                    }
+                    {
+                        pokemon_v2_pokemonstats: {
+                            base_stat: { _gte: $specialdefense }
+                            pokemon_v2_stat: { name: { _eq: "special-defense" } }
                         }
                     }
                 ]
@@ -252,6 +294,29 @@ export const pokemonDetailQuery = gql`
                     ) {
                         id
                         description
+                    }
+                }
+            }
+            pokemon_v2_pokemonspecy {
+                base_happiness
+                capture_rate
+                evolution_chain_id
+                evolves_from_species_id
+                forms_switchable
+                gender_rate
+                generation_id
+                growth_rate_id
+                has_gender_differences
+                is_baby
+                is_legendary
+                is_mythical
+                
+                pokemon_v2_evolutionchain{
+                    id
+    
+                    pokemon_v2_pokemonspecies{
+                        id
+                        name
                     }
                 }
             }

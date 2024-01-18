@@ -5,7 +5,7 @@ import AutocompleteName from './autocomplete/AutocompleteName';
 import IntegerSelector from './selectors/IntegerSelector';
 import { allPokemonAndSpritesQuery, pokemonDetailQuery, pokemonHeightWeightQuery, pokemonHeightWeightStatQuery, pokemonHeightWeightTypeQuery, pokemonHeightWeightTypeStatQuery, pokemonTypesQuery } from './GqlQueries';
 import PokeCard from './PokeCard';
-import { Accordion, AccordionDetails, AccordionSummary, List, ListItem, Pagination, Paper } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Divider, List, ListItem, Pagination, Paper } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import PokeDetail from './PokeDetail';
 import AutocompleteType from './autocomplete/AutocompleteType';
@@ -24,6 +24,9 @@ type State = {
   selectedWeight?: number
   selectedHp?: number
   selectedAttack?: number
+  selectedDefense?: number
+  selectedSpecialAttack?: number
+  selectedSpecialDefense?: number
   selectedPokemon?: Pokemon_V2_Pokemon
   selectedType?: string[]
   currentPage: number
@@ -49,6 +52,9 @@ export default class Pokedex extends Component<Props, State> {
     this.weightChanged = this.weightChanged.bind(this)
     this.hpChanged = this.hpChanged.bind(this)
     this.attackChanged = this.attackChanged.bind(this)
+    this.defenseChanged = this.defenseChanged.bind(this)
+    this.specialAttackChanged = this.specialAttackChanged.bind(this)
+    this.specialDefenseChanged = this.specialDefenseChanged.bind(this)
     this.loadNextPage = this.loadNextPage.bind(this)
     this.runQuery = this.runQuery.bind(this)
     this.getPokemonDetails = this.getPokemonDetails.bind(this)
@@ -171,6 +177,39 @@ export default class Pokedex extends Component<Props, State> {
     }, () => this.runQuery())
   }
 
+  defenseChanged(value: number): void {
+    if (Number.isNaN(value)) {
+      return
+    }
+
+    this.setState({
+      selectedDefense: value,
+      currentPage: 1
+    }, () => this.runQuery())
+  }
+
+  specialAttackChanged(value: number): void {
+    if (Number.isNaN(value)) {
+      return
+    }
+
+    this.setState({
+      selectedSpecialAttack: value,
+      currentPage: 1
+    }, () => this.runQuery())
+  }
+
+  specialDefenseChanged(value: number): void {
+    if (Number.isNaN(value)) {
+      return
+    }
+
+    this.setState({
+      selectedSpecialDefense: value,
+      currentPage: 1
+    }, () => this.runQuery())
+  }
+
   loadNextPage(event: any, value: number): void {
     if (Number.isNaN(value)) {
       return
@@ -193,15 +232,23 @@ export default class Pokedex extends Component<Props, State> {
         variables.type = this.state.selectedType
         queryToRun = pokemonHeightWeightTypeQuery
 
-        if (this.state.selectedHp !== undefined || this.state.selectedAttack !== undefined) {
+        if (this.state.selectedHp !== undefined || this.state.selectedAttack !== undefined || this.state.selectedDefense !== undefined
+          || this.state.selectedSpecialAttack !== undefined || this.state.selectedSpecialDefense !== undefined) {
           variables.hp = this.state.selectedHp
           variables.attack = this.state.selectedAttack
+          variables.defense = this.state.selectedDefense
+          variables.specialattack = this.state.selectedSpecialAttack
+          variables.specialdefense = this.state.selectedSpecialDefense
           queryToRun = pokemonHeightWeightTypeStatQuery
         }
       }
-      else if (this.state.selectedHp !== undefined || this.state.selectedAttack !== undefined) {
+      else if (this.state.selectedHp !== undefined || this.state.selectedAttack !== undefined || this.state.selectedDefense !== undefined
+        || this.state.selectedSpecialAttack !== undefined || this.state.selectedSpecialDefense !== undefined) {
         variables.hp = this.state.selectedHp
         variables.attack = this.state.selectedAttack
+        variables.defense = this.state.selectedDefense
+        variables.specialattack = this.state.selectedSpecialAttack
+        variables.specialdefense = this.state.selectedSpecialDefense
         queryToRun = pokemonHeightWeightStatQuery
       }
 
@@ -259,10 +306,15 @@ export default class Pokedex extends Component<Props, State> {
                   <AccordionDetails>
                     <AutocompleteName label='Name' value={this.state.selectedName} searchTextChanged={this.nameChanged} pokemon={this.state.filteredPokemon} />
                     <AutocompleteType label='Type' value={this.state.selectedType} searchTextChanged={this.typeChanged} types={this.state.types} />
-                    <IntegerSelector label='Height' handleChanged={this.heightChanged} />
-                    <IntegerSelector label='Weight' handleChanged={this.weightChanged} />
+                    <Divider>Stats</Divider>
                     <IntegerSelector label='Hp' handleChanged={this.hpChanged} />
                     <IntegerSelector label='Attack' handleChanged={this.attackChanged} />
+                    <IntegerSelector label='Defense' handleChanged={this.defenseChanged} />
+                    <IntegerSelector label='Special Attack' handleChanged={this.specialAttackChanged} />
+                    <IntegerSelector label='Special Defense' handleChanged={this.specialDefenseChanged} />
+                    <Divider>Physical Traights</Divider>
+                    <IntegerSelector label='Height' handleChanged={this.heightChanged} />
+                    <IntegerSelector label='Weight' handleChanged={this.weightChanged} />
                   </AccordionDetails>
                 </Accordion>
                 <List sx={{ overflow: 'auto', maxHeight: '80vh' }}>
