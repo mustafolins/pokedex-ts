@@ -3,9 +3,10 @@ import { ApolloClient, DocumentNode, NormalizedCacheObject } from '@apollo/clien
 import { Pokemon_V2_Pokemon, Pokemon_V2_Type } from '../gql/graphql';
 import AutocompleteName from './autocomplete/AutocompleteName';
 import IntegerSelector from './selectors/IntegerSelector';
-import { allPokemonAndSpritesQuery, pokemonDetailQuery, pokemonHeightWeightQuery, pokemonHeightWeightTypeQuery, pokemonTypesQuery } from './GqlQueries';
+import { allPokemonAndSpritesQuery, pokemonDetailQuery, pokemonHeightWeightQuery, pokemonHeightWeightStatQuery, pokemonHeightWeightTypeQuery, pokemonHeightWeightTypeStatQuery, pokemonTypesQuery } from './GqlQueries';
 import PokeCard from './PokeCard';
-import { List, ListItem, Pagination, Paper } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, List, ListItem, Pagination, Paper } from '@mui/material';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import PokeDetail from './PokeDetail';
 import AutocompleteType from './autocomplete/AutocompleteType';
 
@@ -21,8 +22,10 @@ type State = {
   selectedName?: string,
   selectedHeight?: number
   selectedWeight?: number
+  selectedHp?: number
+  selectedAttack?: number
   selectedPokemon?: Pokemon_V2_Pokemon
-  selectedType?: string
+  selectedType?: string[]
   currentPage: number
 }
 
@@ -36,7 +39,7 @@ export default class Pokedex extends Component<Props, State> {
       types: [],
       selected: 1,
       selectedName: 'bulbasaur', // this is the first pokemon
-      selectedType: '',
+      selectedType: [],
       currentPage: 1
     }
 
@@ -44,6 +47,8 @@ export default class Pokedex extends Component<Props, State> {
     this.typeChanged = this.typeChanged.bind(this)
     this.heightChanged = this.heightChanged.bind(this)
     this.weightChanged = this.weightChanged.bind(this)
+    this.hpChanged = this.hpChanged.bind(this)
+    this.attackChanged = this.attackChanged.bind(this)
     this.loadNextPage = this.loadNextPage.bind(this)
     this.runQuery = this.runQuery.bind(this)
     this.getPokemonDetails = this.getPokemonDetails.bind(this)
@@ -115,17 +120,11 @@ export default class Pokedex extends Component<Props, State> {
     }
   }
 
-  typeChanged(value: string): void {
+  typeChanged(value: string[]): void {
     this.setState({
       selectedType: value,
       currentPage: 1
-    }, () => {
-      if (this.state.types.find((type) => type.name === value) === undefined && value !== '') {
-        return
-      }
-
-      this.runQuery()
-    })
+    }, () => this.runQuery())
   }
 
   heightChanged(value: number): void {
@@ -150,6 +149,28 @@ export default class Pokedex extends Component<Props, State> {
     }, () => this.runQuery())
   }
 
+  hpChanged(value: number): void {
+    if (Number.isNaN(value)) {
+      return
+    }
+
+    this.setState({
+      selectedHp: value,
+      currentPage: 1
+    }, () => this.runQuery())
+  }
+
+  attackChanged(value: number): void {
+    if (Number.isNaN(value)) {
+      return
+    }
+
+    this.setState({
+      selectedAttack: value,
+      currentPage: 1
+    }, () => this.runQuery())
+  }
+
   loadNextPage(event: any, value: number): void {
     if (Number.isNaN(value)) {
       return
@@ -168,9 +189,20 @@ export default class Pokedex extends Component<Props, State> {
       variables.weight = this.state.selectedWeight
       variables.height = this.state.selectedHeight
 
-      if (this.state.types.find((type) => type.name === this.state.selectedType) !== undefined) {
+      if (this.state.types.find((type) => this.state.selectedType?.find((selectedType) => selectedType === type.name)) !== undefined) {
         variables.type = this.state.selectedType
         queryToRun = pokemonHeightWeightTypeQuery
+
+        if (this.state.selectedHp !== undefined || this.state.selectedAttack !== undefined) {
+          variables.hp = this.state.selectedHp
+          variables.attack = this.state.selectedAttack
+          queryToRun = pokemonHeightWeightTypeStatQuery
+        }
+      }
+      else if (this.state.selectedHp !== undefined || this.state.selectedAttack !== undefined) {
+        variables.hp = this.state.selectedHp
+        variables.attack = this.state.selectedAttack
+        queryToRun = pokemonHeightWeightStatQuery
       }
 
     }
@@ -213,10 +245,6 @@ export default class Pokedex extends Component<Props, State> {
   render() {
     return (
       <Paper elevation={0}>
-        <AutocompleteName label='Name' value={this.state.selectedName} searchTextChanged={this.nameChanged} pokemon={this.state.filteredPokemon} />
-        <AutocompleteType label='Type' value={this.state.selectedType} searchTextChanged={this.typeChanged} types={this.state.types} />
-        <IntegerSelector label='Height' handleChanged={this.heightChanged} />
-        <IntegerSelector label='Weight' handleChanged={this.weightChanged} />
         <table style={{ width: '100%', height: '75%' }}>
           <tbody>
             <tr>
@@ -224,6 +252,19 @@ export default class Pokedex extends Component<Props, State> {
                 {this.state.selectedPokemon === undefined ? null : <PokeDetail pokemon={this.state.selectedPokemon} />}
               </td>
               <td width='30%'>
+                <Accordion sx={{ margin: '15px' }} disableGutters={true} elevation={1}>
+                  <AccordionSummary expandIcon={<FilterListIcon />}>
+                    Filter
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <AutocompleteName label='Name' value={this.state.selectedName} searchTextChanged={this.nameChanged} pokemon={this.state.filteredPokemon} />
+                    <AutocompleteType label='Type' value={this.state.selectedType} searchTextChanged={this.typeChanged} types={this.state.types} />
+                    <IntegerSelector label='Height' handleChanged={this.heightChanged} />
+                    <IntegerSelector label='Weight' handleChanged={this.weightChanged} />
+                    <IntegerSelector label='Hp' handleChanged={this.hpChanged} />
+                    <IntegerSelector label='Attack' handleChanged={this.attackChanged} />
+                  </AccordionDetails>
+                </Accordion>
                 <List sx={{ overflow: 'auto', maxHeight: '80vh' }}>
                   {
                     this.state.filteredPokemon.length < 1 ? null : this.state.filteredPokemon.slice(this.state.currentPage * 10 - 10, this.state.currentPage * 10).map((pokemon, index) =>

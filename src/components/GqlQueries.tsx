@@ -39,13 +39,13 @@ export const pokemonHeightWeightQuery = gql`
 `;
 
 export const pokemonHeightWeightTypeQuery = gql`
-    query PokemonHeightWeightType($height: Int = 0, $weight: Int = 0, $type: String) {
+    query PokemonHeightWeightType($height: Int = 0, $weight: Int = 0, $type: [String!]) {
         pokemon: pokemon_v2_pokemon(
             where: {
                 height: { _gte: $height }
                 weight: { _gte: $weight }
                 _and: [{
-                    pokemon_v2_pokemontypes: { pokemon_v2_type: { name: { _eq: $type } } }
+                    pokemon_v2_pokemontypes: { pokemon_v2_type: { name: { _in: $type } } }
                 }]
             }
         ) {
@@ -53,6 +53,72 @@ export const pokemonHeightWeightTypeQuery = gql`
         }
     }
 `;
+
+export const pokemonHeightWeightTypeStatQuery = gql`
+    query PokemonHeightWeightType(
+        $height: Int = 0
+        $weight: Int = 0
+        $type: [String!]
+        $hp: Int! = 0
+        $attack: Int! = 0
+    ) {
+        pokemon: pokemon_v2_pokemon(
+            where: {
+                height: { _gte: $height }
+                weight: { _gte: $weight }
+                _and: [
+                    { pokemon_v2_pokemontypes: { pokemon_v2_type: { name: { _in: $type } } } }
+                    {
+                        pokemon_v2_pokemonstats: {
+                            base_stat: { _gte: $hp }
+                            pokemon_v2_stat: { name: { _eq: "hp" } }
+                        }
+                    }
+                    {
+                        pokemon_v2_pokemonstats: {
+                            base_stat: { _gte: $attack }
+                            pokemon_v2_stat: { name: { _eq: "attack" } }
+                        }
+                    }
+                ]
+            }
+        ) {
+            id
+        }
+    }
+`
+
+export const pokemonHeightWeightStatQuery = gql`
+    query PokemonHeightWeightType(
+        $height: Int = 0
+        $weight: Int = 0
+        $hp: Int! = 0
+        $attack: Int! = 0
+    ) {
+        pokemon: pokemon_v2_pokemon(
+            where: {
+                height: { _gte: $height }
+                weight: { _gte: $weight }
+                _and: [
+                    {
+                        pokemon_v2_pokemonstats: {
+                            base_stat: { _gte: $hp }
+                            pokemon_v2_stat: { name: { _eq: "hp" } }
+                        }
+                    }
+                    {
+                        pokemon_v2_pokemonstats: {
+                            base_stat: { _gte: $attack }
+                            pokemon_v2_stat: { name: { _eq: "attack" } }
+                        }
+                    }
+                ]
+            }
+        ) {
+            id
+        }
+    }
+`
 
 export const pokemonDetailQuery = gql`
     query PokemonDetail($id: Int = 1) {
@@ -79,7 +145,7 @@ export const pokemonDetailQuery = gql`
                     rarity
                     slot
                     version_group_id
-                    encoutnermethod: pokemon_v2_encountermethod {
+                    pokemon_v2_encountermethod {
                         id
                         name
                         order
@@ -151,7 +217,7 @@ export const pokemonDetailQuery = gql`
                     name
                 }
             }
-            pokemon_v2_pokemonmoves {
+            pokemon_v2_pokemonmoves(distinct_on: move_id) {
                 id
                 level
                 move_id

@@ -1,11 +1,11 @@
-import { Autocomplete, AutocompleteInputChangeReason, CircularProgress, FormControl, TextField } from '@mui/material'
+import { Autocomplete, AutocompleteChangeDetails, AutocompleteChangeReason, CircularProgress, FormControl, TextField } from '@mui/material'
 import React, { Component } from 'react'
 import { Pokemon_V2_Type } from '../../gql/graphql'
 
 type Props = {
-    searchTextChanged(value: any): void,
+    searchTextChanged(value: string[]): void,
     label: string,
-    value?: string,
+    value?: string[],
     types: Pokemon_V2_Type[]
 }
 
@@ -25,7 +25,7 @@ export default class AutocompleteType extends Component<Props, State> {
         this.getTypes = this.getTypes.bind(this)
         this.isLoading = this.isLoading.bind(this)
     }
-    autocompleteInputChanged(event: React.SyntheticEvent<Element, Event>, value: string, reason: AutocompleteInputChangeReason): void {
+    autocompleteInputChanged(event: React.SyntheticEvent<Element, Event>, value: string[], reason: AutocompleteChangeReason, details?: AutocompleteChangeDetails<string> | undefined): void {
         this.props.searchTextChanged(value)
         console.log(value)
     }
@@ -42,10 +42,10 @@ export default class AutocompleteType extends Component<Props, State> {
                     value={this.props.value}
                     autoComplete
                     autoSelect
-                    freeSolo
+                    multiple
                     options={this.getTypes()}
                     loading={this.isLoading()}
-                    onInputChange={this.autocompleteInputChanged}
+                    onChange={this.autocompleteInputChanged}
                     renderInput={(params) => (
                         <TextField
                             {...params}
