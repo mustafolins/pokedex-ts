@@ -259,7 +259,7 @@ export const pokemonDetailQuery = gql`
                     name
                 }
             }
-            pokemon_v2_pokemonmoves(distinct_on: move_id) {
+            pokemon_v2_pokemonmoves(distinct_on: move_id, order_by: {move_id: asc}) {
                 id
                 level
                 move_id
@@ -314,9 +314,10 @@ export const pokemonDetailQuery = gql`
                 pokemon_v2_evolutionchain{
                     id
     
-                    pokemon_v2_pokemonspecies{
+                    pokemon_v2_pokemonspecies(order_by: {order: asc}){
                         id
                         name
+                        order
                     }
                 }
             }

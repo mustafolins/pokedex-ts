@@ -296,7 +296,7 @@ export default class Pokedex extends Component<Props, State> {
           <tbody>
             <tr>
               <td>
-                {this.state.selectedPokemon === undefined ? null : <PokeDetail pokemon={this.state.selectedPokemon} />}
+                {this.state.selectedPokemon === undefined ? null : <PokeDetail pokemon={this.state.selectedPokemon} pokemons={this.state.pokemon} selectPokemon={this.selectPokemon} />}
               </td>
               <td width='30%'>
                 <Accordion sx={{ margin: '15px' }} disableGutters={true} elevation={1}>

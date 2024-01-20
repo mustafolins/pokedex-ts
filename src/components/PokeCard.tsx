@@ -4,6 +4,7 @@ import { Card } from '@mui/material'
 
 type Props = {
     pokemon: Pokemon_V2_Pokemon
+    noBoarder?: boolean
     selectPokemon(pokemon: Pokemon_V2_Pokemon): void
 }
 
@@ -25,7 +26,7 @@ export default class PokeCard extends Component<Props, State> {
     }
     render() {
         return (
-            <Card variant="elevation" elevation={2} sx={{ width: '100%', height: '100%', border: 'solid' }} onClick={this.handleClicked}>
+            <Card variant="elevation" elevation={2} sx={{ width: '100%', height: '100%', border: this.props?.noBoarder ? 'none' : 'solid' }} onClick={this.handleClicked}>
                 <table>
                     <tbody>
                         <tr>

@@ -5,6 +5,8 @@ import PokeDetailTabs from './PokeDetailTabs'
 
 type Props = {
     pokemon: Pokemon_V2_Pokemon
+    pokemons: Pokemon_V2_Pokemon[],
+    selectPokemon(pokemon: Pokemon_V2_Pokemon): void
 }
 
 type State = {
@@ -37,7 +39,7 @@ export default class PokeDetail extends Component<Props, State> {
                 <CardContent>
                     <Paper elevation={2}>
                         <Divider />
-                        <PokeDetailTabs pokemon={this.props.pokemon} />
+                        <PokeDetailTabs pokemon={this.props.pokemon} pokemons={this.props.pokemons} selectPokemon={this.props.selectPokemon} />
                     </Paper>
                 </CardContent>
             </Card>
