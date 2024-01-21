@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import { ApolloClient, DocumentNode, NormalizedCacheObject } from '@apollo/client';
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { Pokemon_V2_Pokemon, Pokemon_V2_Type } from '../gql/graphql';
 import AutocompleteName from './autocomplete/AutocompleteName';
 import IntegerSelector from './selectors/IntegerSelector';
-import { allPokemonAndSpritesQuery, pokemonDetailQuery, pokemonHeightWeightQuery, pokemonHeightWeightStatQuery, pokemonHeightWeightTypeQuery, pokemonHeightWeightTypeStatQuery, pokemonTypesQuery } from './GqlQueries';
+import { allPokemonAndSpritesQuery, pokemonDetailQuery, pokemonTypesQuery } from './GqlQueries';
 import PokeCard from './PokeCard';
 import { Accordion, AccordionDetails, AccordionSummary, Divider, List, ListItem, Pagination, Paper } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -56,14 +56,15 @@ export default class Pokedex extends Component<Props, State> {
     this.specialAttackChanged = this.specialAttackChanged.bind(this)
     this.specialDefenseChanged = this.specialDefenseChanged.bind(this)
     this.loadNextPage = this.loadNextPage.bind(this)
-    this.runQuery = this.runQuery.bind(this)
+    this.getAllPokemon = this.getAllPokemon.bind(this)
+    this.filter = this.filter.bind(this)
     this.getPokemonDetails = this.getPokemonDetails.bind(this)
     this.getPokemonTypes = this.getPokemonTypes.bind(this)
     this.selectPokemon = this.selectPokemon.bind(this)
   }
 
   componentDidMount(): void {
-    this.runQuery(true)
+    this.getAllPokemon()
     this.getPokemonDetails()
     this.getPokemonTypes()
   }
@@ -130,7 +131,7 @@ export default class Pokedex extends Component<Props, State> {
     this.setState({
       selectedType: value,
       currentPage: 1
-    }, () => this.runQuery())
+    }, () => this.filter())
   }
 
   heightChanged(value: number): void {
@@ -141,7 +142,7 @@ export default class Pokedex extends Component<Props, State> {
     this.setState({
       selectedHeight: value,
       currentPage: 1
-    }, () => this.runQuery())
+    }, () => this.filter())
   }
 
   weightChanged(value: number): void {
@@ -152,7 +153,7 @@ export default class Pokedex extends Component<Props, State> {
     this.setState({
       selectedWeight: value,
       currentPage: 1
-    }, () => this.runQuery())
+    }, () => this.filter())
   }
 
   hpChanged(value: number): void {
@@ -163,7 +164,7 @@ export default class Pokedex extends Component<Props, State> {
     this.setState({
       selectedHp: value,
       currentPage: 1
-    }, () => this.runQuery())
+    }, () => this.filter())
   }
 
   attackChanged(value: number): void {
@@ -174,7 +175,7 @@ export default class Pokedex extends Component<Props, State> {
     this.setState({
       selectedAttack: value,
       currentPage: 1
-    }, () => this.runQuery())
+    }, () => this.filter())
   }
 
   defenseChanged(value: number): void {
@@ -185,7 +186,7 @@ export default class Pokedex extends Component<Props, State> {
     this.setState({
       selectedDefense: value,
       currentPage: 1
-    }, () => this.runQuery())
+    }, () => this.filter())
   }
 
   specialAttackChanged(value: number): void {
@@ -196,7 +197,7 @@ export default class Pokedex extends Component<Props, State> {
     this.setState({
       selectedSpecialAttack: value,
       currentPage: 1
-    }, () => this.runQuery())
+    }, () => this.filter())
   }
 
   specialDefenseChanged(value: number): void {
@@ -207,7 +208,7 @@ export default class Pokedex extends Component<Props, State> {
     this.setState({
       selectedSpecialDefense: value,
       currentPage: 1
-    }, () => this.runQuery())
+    }, () => this.filter())
   }
 
   loadNextPage(event: any, value: number): void {
@@ -220,73 +221,63 @@ export default class Pokedex extends Component<Props, State> {
     })
   }
 
-  runQuery(allQuery: boolean = false): void {
-    var queryToRun: DocumentNode = allPokemonAndSpritesQuery
-    var variables: any = {}
-    if (!allQuery) {
-      queryToRun = pokemonHeightWeightQuery
-      variables.weight = this.state.selectedWeight
-      variables.height = this.state.selectedHeight
+  filter(): void {
+    this.setState({
+      filteredPokemon: this.state.pokemon.filter((pokemon) => {
+        var shouldShow = false
 
-      if (this.state.types.find((type) => this.state.selectedType?.find((selectedType) => selectedType === type.name)) !== undefined) {
-        variables.type = this.state.selectedType
-        queryToRun = pokemonHeightWeightTypeQuery
-
-        if (this.state.selectedHp !== undefined || this.state.selectedAttack !== undefined || this.state.selectedDefense !== undefined
-          || this.state.selectedSpecialAttack !== undefined || this.state.selectedSpecialDefense !== undefined) {
-          variables.hp = this.state.selectedHp
-          variables.attack = this.state.selectedAttack
-          variables.defense = this.state.selectedDefense
-          variables.specialattack = this.state.selectedSpecialAttack
-          variables.specialdefense = this.state.selectedSpecialDefense
-          queryToRun = pokemonHeightWeightTypeStatQuery
+        if (this.state.selectedType !== undefined && this.state.selectedType.length > 0) {
+          var hasType = false
+          for (const type of this.state.selectedType) {
+            if (pokemon.pokemon_v2_pokemontypes.some((pokeType) => pokeType.pokemon_v2_type?.name === type))
+              hasType ||= true
+          }
+          shouldShow ||= hasType
         }
-      }
-      else if (this.state.selectedHp !== undefined || this.state.selectedAttack !== undefined || this.state.selectedDefense !== undefined
-        || this.state.selectedSpecialAttack !== undefined || this.state.selectedSpecialDefense !== undefined) {
-        variables.hp = this.state.selectedHp
-        variables.attack = this.state.selectedAttack
-        variables.defense = this.state.selectedDefense
-        variables.specialattack = this.state.selectedSpecialAttack
-        variables.specialdefense = this.state.selectedSpecialDefense
-        queryToRun = pokemonHeightWeightStatQuery
-      }
+        else {
+          shouldShow = true
+        }
+        if (this.state.selectedHp !== undefined) {
+          shouldShow &&= pokemon.pokemon_v2_pokemonstats.find((stat) => stat.pokemon_v2_stat?.name === 'hp' && stat.base_stat >= this.state.selectedHp!) !== undefined
+        }
+        if (this.state.selectedAttack !== undefined) {
+          shouldShow &&= pokemon.pokemon_v2_pokemonstats.find((stat) => stat.pokemon_v2_stat?.name === 'attack' && stat.base_stat >= this.state.selectedAttack!) !== undefined
+        }
+        if (this.state.selectedDefense !== undefined) {
+          shouldShow &&= pokemon.pokemon_v2_pokemonstats.find((stat) => stat.pokemon_v2_stat?.name === 'defense' && stat.base_stat >= this.state.selectedDefense!) !== undefined
+        }
+        if (this.state.selectedSpecialAttack !== undefined) {
+          shouldShow &&= pokemon.pokemon_v2_pokemonstats.find((stat) => stat.pokemon_v2_stat?.name === 'special-attack' && stat.base_stat >= this.state.selectedSpecialAttack!) !== undefined
+        }
+        if (this.state.selectedSpecialDefense !== undefined) {
+          shouldShow &&= pokemon.pokemon_v2_pokemonstats.find((stat) => stat.pokemon_v2_stat?.name === 'special-defense' && stat.base_stat >= this.state.selectedSpecialDefense!) !== undefined
+        }
+        if (this.state.selectedWeight !== undefined && pokemon.weight !== undefined) {
+          shouldShow &&= pokemon.weight! >= this.state.selectedWeight
+        }
+        if (this.state.selectedHeight !== undefined && pokemon.height !== undefined) {
+          shouldShow &&= pokemon.height! >= this.state.selectedHeight
+        }
 
-    }
-    else {
-      variables = {}
-    }
+        return shouldShow;
+      })
+    })
+  }
 
-    if (allQuery) {
-      this.props.client
-        .query({
-          query: queryToRun
+  getAllPokemon(): void {
+    this.props.client
+      .query({
+        query: allPokemonAndSpritesQuery
+      })
+      .then((result) => {
+        console.log(result.data)
+        console.log(result.data.pokemon)
+
+        this.setState({
+          pokemon: result.data.pokemon,
+          filteredPokemon: result.data.pokemon
         })
-        .then((result) => {
-          console.log(result.data)
-          console.log(result.data.pokemon)
-
-          this.setState({
-            pokemon: result.data.pokemon,
-            filteredPokemon: result.data.pokemon
-          })
-        });
-    }
-    else {
-      this.props.client
-        .query({
-          query: queryToRun,
-          variables: variables
-        })
-        .then((result) => {
-          console.log(result.data)
-          console.log(result.data.pokemon)
-
-          this.setState({
-            filteredPokemon: this.state.pokemon.filter((pokemon) => (result.data.pokemon as Pokemon_V2_Pokemon[]).some((ap) => ap.id === pokemon.id))
-          })
-        });
-    }
+      });
   }
 
   render() {

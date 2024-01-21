@@ -2,20 +2,31 @@ import { gql } from '@apollo/client';
 
 export const allPokemonAndSpritesQuery = gql`
     query AllPokemonData {
-      pokemon: pokemon_v2_pokemon {
-          base_experience
-          height
-          id
-          is_default
-          name
-          order
-          pokemon_species_id
-          weight
-          pokemon_v2_pokemonsprites {
-              id
-              sprites
-          }
-      }
+        pokemon: pokemon_v2_pokemon {
+            base_experience
+            height
+            id
+            is_default
+            name
+            order
+            pokemon_species_id
+            weight
+            pokemon_v2_pokemontypes{
+                pokemon_v2_type{
+                    name
+                }
+            }
+            pokemon_v2_pokemonstats {
+                base_stat
+                pokemon_v2_stat{
+                    name
+                }
+            }
+            pokemon_v2_pokemonsprites {
+                id
+                sprites
+            }
+        }
     }
 `;
 
@@ -27,140 +38,6 @@ export const pokemonTypesQuery = gql`
         }
     }
 `;
-
-export const pokemonHeightWeightQuery = gql`
-    query PokemonHeightWeight($height: Int = 0, $weight: Int = 0) {
-        pokemon: pokemon_v2_pokemon(
-            where: { height: { _gte: $height }, weight: { _gte: $weight } }
-        ) {
-            id
-        }
-    }
-`;
-
-export const pokemonHeightWeightTypeQuery = gql`
-    query PokemonHeightWeightType($height: Int = 0, $weight: Int = 0, $type: [String!]) {
-        pokemon: pokemon_v2_pokemon(
-            where: {
-                height: { _gte: $height }
-                weight: { _gte: $weight }
-                _and: [{
-                    pokemon_v2_pokemontypes: { pokemon_v2_type: { name: { _in: $type } } }
-                }]
-            }
-        ) {
-            id
-        }
-    }
-`;
-
-export const pokemonHeightWeightTypeStatQuery = gql`
-    query PokemonHeightWeightType(
-        $height: Int = 0
-        $weight: Int = 0
-        $type: [String!]
-        $hp: Int! = 0
-        $attack: Int! = 0
-        $defense: Int! = 0
-        $specialattack: Int! = 0
-        $specialdefense: Int! = 0
-    ) {
-        pokemon: pokemon_v2_pokemon(
-            where: {
-                height: { _gte: $height }
-                weight: { _gte: $weight }
-                _and: [
-                    { pokemon_v2_pokemontypes: { pokemon_v2_type: { name: { _in: $type } } } }
-                    {
-                        pokemon_v2_pokemonstats: {
-                            base_stat: { _gte: $hp }
-                            pokemon_v2_stat: { name: { _eq: "hp" } }
-                        }
-                    }
-                    {
-                        pokemon_v2_pokemonstats: {
-                            base_stat: { _gte: $attack }
-                            pokemon_v2_stat: { name: { _eq: "attack" } }
-                        }
-                    }
-                    {
-                        pokemon_v2_pokemonstats: {
-                            base_stat: { _gte: $defense }
-                            pokemon_v2_stat: { name: { _eq: "defense" } }
-                        }
-                    }
-                    {
-                        pokemon_v2_pokemonstats: {
-                            base_stat: { _gte: $specialattack }
-                            pokemon_v2_stat: { name: { _eq: "special-attack" } }
-                        }
-                    }
-                    {
-                        pokemon_v2_pokemonstats: {
-                            base_stat: { _gte: $specialdefense }
-                            pokemon_v2_stat: { name: { _eq: "special-defense" } }
-                        }
-                    }
-                ]
-            }
-        ) {
-            id
-        }
-    }
-`
-
-export const pokemonHeightWeightStatQuery = gql`
-    query PokemonHeightWeightType(
-        $height: Int = 0
-        $weight: Int = 0
-        $hp: Int! = 0
-        $attack: Int! = 0
-        $defense: Int! = 0
-        $specialattack: Int! = 0
-        $specialdefense: Int! = 0
-    ) {
-        pokemon: pokemon_v2_pokemon(
-            where: {
-                height: { _gte: $height }
-                weight: { _gte: $weight }
-                _and: [
-                    {
-                        pokemon_v2_pokemonstats: {
-                            base_stat: { _gte: $hp }
-                            pokemon_v2_stat: { name: { _eq: "hp" } }
-                        }
-                    }
-                    {
-                        pokemon_v2_pokemonstats: {
-                            base_stat: { _gte: $attack }
-                            pokemon_v2_stat: { name: { _eq: "attack" } }
-                        }
-                    }
-                    {
-                        pokemon_v2_pokemonstats: {
-                            base_stat: { _gte: $defense }
-                            pokemon_v2_stat: { name: { _eq: "defense" } }
-                        }
-                    }
-                    {
-                        pokemon_v2_pokemonstats: {
-                            base_stat: { _gte: $specialattack }
-                            pokemon_v2_stat: { name: { _eq: "special-attack" } }
-                        }
-                    }
-                    {
-                        pokemon_v2_pokemonstats: {
-                            base_stat: { _gte: $specialdefense }
-                            pokemon_v2_stat: { name: { _eq: "special-defense" } }
-                        }
-                    }
-                ]
-            }
-        ) {
-            id
-        }
-    }
-`
 
 export const pokemonDetailQuery = gql`
     query PokemonDetail($id: Int = 1) {
